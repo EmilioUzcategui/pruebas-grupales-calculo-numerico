@@ -1,0 +1,126 @@
+#primer ejecicio con grafica
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+def gauss_seidel(A, b, x0, tol=1e-6, max_iter=100):
+    n = len(A)
+    x = x0.copy()
+    
+    for _ in range(max_iter):
+        x_new = np.zeros_like(x)
+        for i in range(n):
+            x_new[i] = (b[i] - np.dot(A[i, :i], x_new[:i]) - np.dot(A[i, i+1:], x[i+1:])) / A[i, i]
+        
+        if np.linalg.norm(x_new - x) < tol:
+            break
+        
+        x = x_new
+    
+    return x
+
+A = np.array([[10, -1, 2],
+              [-1, 11, -1],
+              [2, -1, 10]])
+b = np.array([6, 25, -11])
+x0 = np.array([0, 0, 0])
+
+solucion = gauss_seidel(A, b, x0)
+print("Solución usando el método de Gauss-Seidel:", solucion)
+
+# Crear la figura 3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Coordenadas de los puntos
+x_coords = np.array([0, 1, 2])
+y_coords = np.array(solucion)
+
+# Generar las barras
+ax.bar(x_coords, y_coords, zs=0, zdir='y', alpha=0.8)
+
+# Etiquetas de los ejes
+ax.set_xlabel('Variable')
+ax.set_ylabel('Valor')
+ax.set_zlabel('')
+
+# Título del gráfico
+plt.title('Solución usando el método de Gauss-Seidel')
+
+plt.show()
+
+
+# Metodo de potencia:
+
+def metodoPotencia(A, v):
+    
+    landa = 0
+    x0 = x1 = v
+    for i in range(7):
+        x0 = x1
+        x1 = np.dot(A, x0)
+        for j in range(len(x0)):
+            if x0[j] == 0:
+                break
+            elif x0[j] != 0:
+                landa = x1[0] / x0[j]
+                break
+    
+    vr = x1/abs(x1)
+    for i in range(len(vr)):
+        vr[i] = np.ceil(vr[i])
+    
+    return vr*np.ceil(landa)
+    
+def mostarPotencia(vector):
+    
+    if vector.size == 3:
+        fig = plt.figure()
+        
+        ax = fig.add_subplot(111, projection='3d')
+        x = [vector[0]]
+        y = [vector[1]]
+        z = [vector[2]]
+        ax.scatter(x, y, z)
+        
+        plt.title('Solución usando metodo de potencia')
+        plt.show()
+    else:
+        print(f"El vector propio resultante no se puede graficar de manera tridimensional (tamaño: {vector.size})")
+
+A = np.array([[4, -1, 1], [-1, 3, -2], [1, -2, 3]])
+v = np.array([[1], [0], [0]])
+
+mostarPotencia(metodoPotencia(A, v))
+
+"""
+En el siguiente algoritmo vamos a observar mediante una grafica como varia
+el numero de condicion de una matriz cuadrada A cuando perturbamos sus elementos.
+"""
+def generar_matriz(n,variaciones):
+    #generamos una matriz que va a ser modificada por un parametro variacion
+    A = np.eye(n) + variaciones * np.random.rand(n, n)
+    print(A)
+    return A
+
+
+dim=int(input("ingrese la dimension de la matriz cuadrada: ")) 
+variaciones = np.linspace(0.1, 10, 10) #array que contiene los valores de variaciones
+#dicho array va a ir desde 0.1 hasta 10 y va a contener 10 elementos, por lo que vamos a evaluar 10 variaciones de numero de condicion 
+numeros_condicion = []#array donde se guardan los numeros de condicion
+
+# Calcular el número de condición para diferentes valores de variciones
+for variacion in variaciones:
+    A = generar_matriz(dim, variacion)
+    num_cond = np.linalg.cond(A)#calculo del numero de condicion
+    numeros_condicion.append(num_cond)#agregamos los numeros de condicion a un array
+
+
+plt.figure(figsize=(10, 6))
+plt.plot(variaciones, numeros_condicion, marker='o', linestyle='-', color='r')
+plt.yscale('log') 
+plt.xlabel('Alpha')
+plt.ylabel('Número de Condición')
+plt.title('Número de Condición de A en función de Alpha')
+plt.grid(True)
+plt.show()
