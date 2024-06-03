@@ -48,3 +48,43 @@ ax.set_zlabel('')
 plt.title('Solución usando el método de Gauss-Seidel')
 
 plt.show()
+
+
+# Metodo de potencia:
+
+def metodoPotencia(A, v):
+    landa = 0
+    x0 = x1 = v
+    for i in range(7):
+        x0 = x1
+        x1 = np.dot(A, x0)
+        for j in range(len(x0)):
+            if x0[j] == 0:
+                break
+            elif x0[j] != 0:
+                landa = x1[0] / x0[j]
+                break
+    
+    vr = x1/abs(x1)
+    for i in range(len(vr)):
+        vr[i] = np.ceil(vr[i])
+    
+    return vr*np.ceil(landa)
+    
+def plot_points(points):
+    fig = plt.figure()
+    
+    ax = fig.add_subplot(111, projection='3d')
+    x = [points[0]]
+    y = [points[1]]
+    z = [points[2]]
+    ax.scatter(x, y, z)
+    
+
+    # Mostrar gráfico
+    plt.show()
+
+A = np.array([[4, -1, 1], [-1, 3, -2], [1, -2, 3]])
+v = np.array([[1], [0], [0]])
+
+plot_points(metodoPotencia(A, v))
